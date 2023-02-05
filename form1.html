@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <title>Book a Call Form</title>
+  </head>
+  <body>
+    <h1>Book a Call</h1>
+    <p>Book a call slot and our representative will call you within 1hr of selected time.</p>
+    <form id="registrationForm">
+      <div class="group">
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name">
+      </div>
+      <div class="group">
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email">
+      </div>
+      <div class="group">
+        <label for="phone">Phone:</label>
+        <input type="tel" id="phone" name="phone">
+      </div>
+      <div class="group">
+        <label for="date">Date:</label>
+        <input type="date" id="date" name="date">
+      </div>
+      <div class="group">
+        <label for="time">Time:</label>
+        <input type="time" id="time" name="time">
+      </div>
+      <button type="submit">GET A CALL</button>
+    </form>
+    <script>
+        const form = document.querySelector("#registrationForm");
+
+        form.addEventListener("submit", function(event) {
+        event.preventDefault();
+        const name = document.querySelector("#name").value;
+        const email = document.querySelector("#email").value;
+        const phone = document.querySelector("#phone").value;
+        const time = document.querySelector("#time").value;
+        const date = document.querySelector("#date").value;
+        
+        console.log("Name: " + name);
+        console.log("Email: " + email);
+        console.log("Phone: " + phone);
+        console.log("Date: " + date);
+        console.log("Time: " + time);  
+        });
+
+    </script>
+  </body>
+</html>
