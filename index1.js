@@ -64,11 +64,12 @@ function filterItems(e){
     var text = e.target.value.toLowerCase();
     // Get lis
     var items = itemList.getElementsByTagName('li');
-    console.log(items);
+   
     // Convert to an array
     Array.from(items).forEach(function(item){
-      var itemName = item.firstChild.textContent || item.childNodes[1];
-      if(itemName.toLowerCase().indexOf(text) != -1){
+      var itemName1 = item.firstChild.textContent;
+      var itemName2 = item.childNodes[1].textContent;
+      if(itemName1.toLowerCase().indexOf(text) != -1 || itemName2.toLowerCase().indexOf(text) != -1){
         item.style.display = 'block';
       } else {
         item.style.display = 'none';
