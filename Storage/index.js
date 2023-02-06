@@ -12,6 +12,9 @@ function storeFormData() {
     
     localStorage.setItem("formData", JSON.stringify(formData));
     console.log("Form data has been stored in local storage.");
+    console.log(localStorage);
+    let deserialized = JSON.parse(localStorage.getItem('formData'));
+    console.log(deserialized);
   }
   
 
