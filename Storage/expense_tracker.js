@@ -3,6 +3,7 @@ const display = document.querySelector('#display');
 const amountInput = document.querySelector('#amount');
 const descInput = document.querySelector('#desc');
 const categoryInput = document.querySelector('#category');
+const BASE_URL = 'https://crudcrud.com/api/61e69bf771f84b56a822535c45196c96/appointmentData';
 
 form.addEventListener('submit', (e) => {
   e.preventDefault();
@@ -10,83 +11,95 @@ form.addEventListener('submit', (e) => {
   const desc = descInput.value;
   const category = categoryInput.options[categoryInput.selectedIndex].value;
 
+  const userData = { amount, desc, category, selectedCategory: categoryInput.options[categoryInput.selectedIndex].text };
 
-  const userData = { amount, desc, category, selectedCategory: categoryInput.options[categoryInput.selectedIndex].text, id: Date.now() };
-
-  let storedData = JSON.parse(localStorage.getItem('userData')) || [];
-  storedData.push(userData);
-  localStorage.setItem('userData', JSON.stringify(storedData));
-
-  displayData();
-  clearInputs();
+  axios.post(BASE_URL, userData)
+    .then(() => {
+      displayData();
+      clearInputs();
+    })
+    .catch((error) => {
+      console.log(error);
+    });
 });
 
-// function to display data in local storage
+// function to display data from the server
 function displayData() {
-    const storedData = JSON.parse(localStorage.getItem('userData')) || [];
-    let data = '';
-    storedData.forEach((user) => {
-      data += `<p>Amount: ${user.amount}</p>
-               <p>Desc: ${user.desc}</p>
-               <p>Category: ${user.selectedCategory}</p>
-               <button class="edit-btn" data-id="${user.id}">Edit Expense</button>
-               <button class="delete-btn" data-id="${user.id}">Delete Expense</button>
-               <hr>`;
-    });
-    display.innerHTML = data;
-    addDeleteEventListeners();
-    addEditEventListeners();
-  
-    // Display selected category on the screen
-    const selectedCategory = document.createElement('p');
-    selectedCategory.innerText = `Selected Category: ${categoryInput.options[categoryInput.selectedIndex].text}`;
-    display.prepend(selectedCategory);
-  }
-  
-  
+  axios.get(BASE_URL)
+    .then((response) => {
+      let data = '';
+      response.data.forEach((user) => {
+        data += `<p>Amount: ${user.amount}</p>
+                <p>Desc: ${user.desc}</p>
+                <p>Category: ${user.selectedCategory}</p>
+                <button class="edit-btn" data-id="${user._id}">Edit Expense</button>
+                <button class="delete-btn" data-id="${user._id}">Delete Expense</button>
+                <hr>`;
+      });
+      display.innerHTML = data;
+      addDeleteEventListeners();
+      addEditEventListeners();
 
-  function addDeleteEventListeners() {
-    const deleteBtns = document.querySelectorAll('.delete-btn');
-    deleteBtns.forEach((btn) => {
-      btn.addEventListener('click', (e) => {
-        const id = e.target.getAttribute('data-id');
-        const category = e.target.parentElement.querySelector('p:nth-of-type(3)').textContent.split(': ')[1];
-        const storedData = JSON.parse(localStorage.getItem('userData')) || [];
-        const updatedData = storedData.filter((user) => user.id != id || user.category != category);
-        localStorage.setItem('userData', JSON.stringify(updatedData));
-        displayData();
-      });
+      // Display selected category on the screen
+      const selectedCategory = document.createElement('p');
+      selectedCategory.innerText = `Selected Category: ${categoryInput.options[categoryInput.selectedIndex].text}`;
+      display.prepend(selectedCategory);
+    })
+    .catch((error) => {
+      console.log(error);
     });
-  }
-  
-  function addEditEventListeners() {
-    const editBtns = document.querySelectorAll('.edit-btn');
-    editBtns.forEach((btn) => {
-      btn.addEventListener('click', (e) => {
-        const id = e.target.getAttribute('data-id');
-        const category = e.target.parentElement.querySelector('p:nth-of-type(3)').textContent.split(': ')[1];
-        const storedData = JSON.parse(localStorage.getItem('userData')) || [];
-        const user = storedData.find((user) => user.id == id && user.category == category);
-        const updatedData = storedData.filter((user) => user.id != id || user.category != category);
-        localStorage.setItem('userData', JSON.stringify(updatedData));
-        amountInput.value = user.amount;
-        descInput.value = user.desc;
-        categoryInput.value = user.category;
-        displayData();
-      });
+}
+
+function addDeleteEventListeners() {
+  const deleteBtns = document.querySelectorAll('.delete-btn');
+  deleteBtns.forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      const id = e.target.getAttribute('data-id');
+      axios.delete(`${BASE_URL}/${id}`)
+        .then(() => {
+          displayData();
+        })
+        .catch((error) => {
+          console.log(error);
+        });
     });
-  }
-  
+  });
+}
+
+function addEditEventListeners() {
+  const editBtns = document.querySelectorAll('.edit-btn');
+  editBtns.forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      const id = e.target.getAttribute('data-id');
+      axios.get(`${BASE_URL}/${id}`)
+        .then((response) => {
+          const user = response.data;
+          axios.delete(`${BASE_URL}/${id}`)
+            .then(() => {
+              amountInput.value = user.amount;
+              descInput.value = user.desc;
+              categoryInput.value = user.category;
+              displayData();
+            })
+            .catch((error) => {
+              console.log(error);
+            });
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    });
+  });
+}
 
 function clearInputs() {
-    amountInput.value = '';
-    descInput.value = '';
-    categoryInput.value = '';
-  
-    // Remove selected category from the screen
-    display.removeChild(display.firstChild);
-  }
-  
+  amountInput.value = '';
+  descInput.value = '';
+  categoryInput.value = '';
+
+  // Remove selected category from the screen
+  display.removeChild(display.firstChild);
+}
 
 // Call displayData function on page load
 displayData();
