@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Product List</title>
+</head>
+<body>
+  
+  
+  <label for="product-name">Product Name:</label>
+  <input type="text" id="product-name" placeholder="Enter product name">
+  
+  <label for="selling-price">Selling Price:</label>
+  <input type="number" id="selling-price" placeholder="Enter selling price">
+  
+  <button onclick="addProduct()">Add Product</button>
+  
+  <hr>
+  
+  <h1>Product List:</h1>
+  
+  <ul id="product-list"></ul>
+  
+  <h3>Total Value Worth of Products: Rs. <span id="total-value">0</span></h3>
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.3.4/axios.min.js"></script>
+  <script>
+    let products = [];
+
+    function addProduct() {
+      const productName = document.getElementById("product-name").value.trim();
+      const sellingPrice = Number(document.getElementById("selling-price").value.trim());
+
+      if (productName !== "" && !isNaN(sellingPrice) && sellingPrice > 0) {
+        products.push({ name: productName, price: sellingPrice });
+        displayProducts();
+        updateTotalValue();
+        postProduct({ name: productName, price: sellingPrice });
+        clearInputs();
+      } else {
+        alert("Invalid input. Please enter a valid product name and selling price.");
+      }
+    }
+
+    function clearInputs() {
+      document.getElementById("product-name").value = "";
+      document.getElementById("selling-price").value = "";
+    }
+
+    function displayProducts() {
+      const productList = document.getElementById("product-list");
+      productList.innerHTML = "";
+
+      products.forEach((product, index) => {
+        const listItem = document.createElement("li");
+
+        const deleteButton = document.createElement("button");
+        deleteButton.innerText = "Delete Product";
+        deleteButton.onclick = () => {
+          products.splice(index, 1);
+          displayProducts();
+          updateTotalValue();
+          deleteProduct(product._id);
+        };
+
+        listItem.innerText = `${product.name} - $${product.price} `;
+        listItem.appendChild(deleteButton);
+
+        productList.appendChild(listItem);
+      });
+    }
+
+    function updateTotalValue() {
+      const totalValueElement = document.getElementById("total-value");
+      const totalValue = products.reduce((accumulator, product) => accumulator + product.price, 0);
+      totalValueElement.innerText = totalValue;
+    }
+
+    function getProducts() {
+      axios.get("https://crudcrud.com/api/e83ee532e9b4426da8e2c8b4c365b377/products")
+        .then(response => {
+          products = response.data;
+          displayProducts();
+          updateTotalValue();
+        })
+        .catch(error => console.log(error));
+    }
+
+    function postProduct(product) {
+      axios.post("https://crudcrud.com/api/e83ee532e9b4426da8e2c8b4c365b377/products", product)
+        .then(response => {
+          product._id = response.data._id;
+        })
+        .catch(error => console.log(error));
+    }
+
+    function deleteProduct(id) {
+      axios.delete(`https://crudcrud.com/api/e83ee532e9b4426da8e2c8b4c365b377/products/${id}`)
+        .then(response => console.log(response))
+        .catch(error => console.log(error));
+    }
+
+    getProducts();
+  </script>
+</body>
+</html>
