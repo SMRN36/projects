@@ -1,0 +1,22 @@
+body{
+    padding-top: 200px;
+    background: powderblue;
+  }
+  .form-signup{
+    margin: 0 auto;
+    max-width: 480px;
+    background-color: white;
+    padding: 15px;
+  }
+  .form-signup h2{
+    text-align: center;
+    font-weight: bold;
+    color: #198754;
+  }
+  .form-signup p{
+    text-align: center;
+    font-size: small;
+  }
+  .form-group{
+    margin-bottom: 10px;
+  }
